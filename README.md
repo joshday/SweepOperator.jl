@@ -11,6 +11,21 @@ The symmetric sweep operator is a powerful tool in computational statistics with
 - MANOVA
 - and more
 
+# `sweep!`
+
+```julia
+sweep!(A, k, inv = false)
+```
+
+For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  Only the upper triangle is read and swept.  The inverse sweep is performed with `inv = true`.
+
+```julia
+sweep!(A, range, inv = false)
+```
+
+Sweep over every index in `range`.
+
+
 # Details on Symmetric Sweeping:
 Thank you to great notes provided by @Hua-Zhou
 
