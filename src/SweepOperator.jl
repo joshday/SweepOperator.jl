@@ -1,6 +1,9 @@
 module SweepOperator
 export sweep!
 
+typealias AMat{T} AbstractMatrix{T}
+typealias AVec{T} AbstractVector{T}
+
 #--------------------------------------------------------------------# sweep! methods
 """
 `sweep!(A, k, inv = false)`
@@ -15,7 +18,7 @@ sweep!(xtx, 1)
 sweep!(xtx, 1, true)
 ```
 """
-function sweep!{T<:Number}(A::AbstractMatrix{T}, k::Integer, inv::Bool = false)
+function sweep!{T<:Number}(A::AMat{T}, k::Integer, inv::Bool = false)
     n, p = size(A)
     # ensure @inbounds is safe
     @assert n == p "A must be square"
@@ -29,13 +32,6 @@ function sweep!{T<:Number}(A::AbstractMatrix{T}, k::Integer, inv::Bool = false)
     for j in k+1:p
         @inbounds akk[j] = A[k, j]
     end
-    # for j in 1:p
-    #     if j <= k
-    #         @inbounds akk[j] = A[j, k]
-    #     else
-    #         @inbounds akk[j] = A[k, j]
-    #     end
-    # end
     BLAS.syrk!('U', 'N', -d, akk, 1.0, A)  # everything not in col/row k
     scale!(akk, d * (-1.0) ^ inv)
     for i in 1:k-1  # col k
@@ -48,7 +44,7 @@ function sweep!{T<:Number}(A::AbstractMatrix{T}, k::Integer, inv::Bool = false)
     A
 end
 
-function sweep!{T<:Number, I<:Integer}(A::AbstractMatrix{T}, ks::AbstractVector{I}, inv::Bool = false)
+function sweep!{T<:Number, I<:Integer}(A::AMat{T}, ks::AVec{I}, inv::Bool = false)
     for k in ks
         sweep!(A, k, inv)
     end
