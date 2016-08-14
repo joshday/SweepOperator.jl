@@ -1,5 +1,13 @@
 using SweepOperator
-using Base.Test
+
+if VERSION >= v"0.5.0-dev+7720"
+    using Base.Test
+else
+    using BaseTestNext
+    const Test = BaseTestNext
+end
+
+
 
 n, p = 1000, 10
 x = randn(n, p)
