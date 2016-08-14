@@ -1,5 +1,6 @@
 using SweepOperator
 
+# necessary to support 0.4 and 0.5
 if VERSION >= v"0.5.0-dev+7720"
     using Base.Test
 else
@@ -8,14 +9,14 @@ else
 end
 
 
-
+# setup
 n, p = 1000, 10
 x = randn(n, p)
 xtx = x'x
 
 
 
-@testset "Sweep one by one" begin
+@testset "Sweep One By One" begin
     A = deepcopy(xtx)
     B = deepcopy(xtx)
     for j in 1:p
@@ -25,7 +26,7 @@ xtx = x'x
     @test A ≈ B
 end
 
-@testset "Sweep all" begin
+@testset "Sweep All" begin
     A = deepcopy(xtx)
     B = deepcopy(xtx)
     sweep!(A, 1:p)
@@ -33,7 +34,7 @@ end
     @test A ≈ B
 end
 
-@testset "Regression" begin
+@testset "Linear Regression" begin
     x = randn(n, p)
     y = x * collect(1.:p) + randn(n)
     xy = [x y]

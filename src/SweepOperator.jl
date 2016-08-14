@@ -4,12 +4,19 @@ export sweep!
 typealias AMat{T} AbstractMatrix{T}
 typealias AVec{T} AbstractVector{T}
 
-#--------------------------------------------------------------------# sweep! methods
-"""
-`sweep!(A, k, inv = false)`
 
+"""
+# Symmetric sweep operator
 Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten.
 `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
+
+`sweep!(A, k, inv = false)`
+
+Providing a Range, rather than an Integer, sweeps on each element in the range.
+
+`sweep!(A, first:last, inv = false)`
+
+### Example:
 
 ```julia
 x = randn(100, 10)
