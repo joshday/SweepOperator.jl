@@ -9,6 +9,7 @@ The symmetric sweep operator is a powerful tool in computational statistics with
 - (stepwise) linear regression
 - conditional multivariate normal distributions
 - MANOVA
+- and more
 
 # Details on Symmetric Sweeping:
 Thank you to great notes provided by @Hua-Zhou
