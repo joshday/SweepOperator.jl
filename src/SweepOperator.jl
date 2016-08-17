@@ -25,12 +25,12 @@ sweep!(xtx, 1)
 sweep!(xtx, 1, true)
 ```
 """
-function sweep!{T<:Number}(A::AMat{T}, k::Integer, inv::Bool = false)
+function sweep!{T<:LinAlg.BlasFloat}(A::AMat{T}, k::Integer, inv::Bool = false)
     n, p = size(A)
     # ensure @inbounds is safe
     @assert n == p "A must be square"
     @assert 1 <= k <= p "pivot element not within range"
-    @inbounds d = 1.0 / A[k, k]  # pivot
+    @inbounds d = one(T) / A[k, k]  # pivot
     # get column A[:, k] (hack because only upper triangle is available)
     akk = zeros(p)
     for j in 1:k
@@ -39,8 +39,8 @@ function sweep!{T<:Number}(A::AMat{T}, k::Integer, inv::Bool = false)
     for j in k+1:p
         @inbounds akk[j] = A[k, j]
     end
-    BLAS.syrk!('U', 'N', -d, akk, 1.0, A)  # everything not in col/row k
-    scale!(akk, d * (-1.0) ^ inv)
+    BLAS.syrk!('U', 'N', -d, akk, one(T), A)  # everything not in col/row k
+    scale!(akk, d * (-one(T)) ^ inv)
     for i in 1:k-1  # col k
         @inbounds A[i, k] = akk[i]
     end
@@ -51,7 +51,7 @@ function sweep!{T<:Number}(A::AMat{T}, k::Integer, inv::Bool = false)
     A
 end
 
-function sweep!{T<:Number, I<:Integer}(A::AMat{T}, ks::AVec{I}, inv::Bool = false)
+function sweep!{T<:LinAlg.BlasFloat, I<:Integer}(A::AMat{T}, ks::AVec{I}, inv::Bool = false)
     for k in ks
         sweep!(A, k, inv)
     end
