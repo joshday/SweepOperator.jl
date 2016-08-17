@@ -24,6 +24,16 @@ xtx = x'x
         sweep!(A, j, true)
     end
     @test A ≈ B
+
+    A = deepcopy(xtx)
+    B = deepcopy(xtx)
+    for j in 1:p
+        sweep!(A, j, true)
+    end
+    for j in 1:p
+        sweep!(A, j, true)
+    end
+    @test A ≈ B
 end
 
 @testset "Sweep All" begin
