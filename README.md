@@ -12,6 +12,11 @@ The symmetric sweep operator is a powerful tool in computational statistics with
 - MANOVA
 - and more
 
+Install with:
+```julia
+Pkg.add("SweepOperator")
+```
+
 # `sweep!`
 
 ```julia
