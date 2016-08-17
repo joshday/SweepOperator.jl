@@ -29,7 +29,7 @@ function sweep!{T<:Number}(A::AMat{T}, k::Integer, inv::Bool = false)
     n, p = size(A)
     # ensure @inbounds is safe
     @assert n == p "A must be square"
-    @assert k <= p "pivot element not within range"
+    @assert 1 <= k <= p "pivot element not within range"
     @inbounds d = 1.0 / A[k, k]  # pivot
     # get column A[:, k] (hack because only upper triangle is available)
     akk = zeros(p)
