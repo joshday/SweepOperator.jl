@@ -23,7 +23,7 @@ Pkg.add("SweepOperator")
 sweep!(A, k, inv = false)
 ```
 
-For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  Only the upper triangle is read and swept.  The inverse sweep is performed with `inv = true`.
+For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  **Only the upper triangle is read and swept**.  The inverse sweep is performed with `inv = true`.
 
 ```julia
 sweep!(A, range, inv = false)
