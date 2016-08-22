@@ -32,7 +32,7 @@ function sweep!{T<:LinAlg.BlasFloat}(A::AMat{T}, k::Integer, inv::Bool = false)
     @assert 1 <= k <= p "pivot element not within range"
     @inbounds d = one(T) / A[k, k]  # pivot
     # get column A[:, k] (hack because only upper triangle is available)
-    akk = zeros(p)
+    akk = zeros(T, p)
     for j in 1:k
         @inbounds akk[j] = A[j, k]
     end
