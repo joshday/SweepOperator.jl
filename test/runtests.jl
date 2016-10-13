@@ -1,3 +1,4 @@
+module SweepOperatorTests
 using SweepOperator
 
 # necessary to support 0.4 and 0.5
@@ -51,4 +52,5 @@ end
     xytxy = xy'xy
     sweep!(xytxy, 1:p)
     @test xytxy[1:p, end] ≈ x\y
+end
 end
