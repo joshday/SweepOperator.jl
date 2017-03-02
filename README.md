@@ -3,8 +3,6 @@
 [![Build Status](https://travis-ci.org/joshday/SweepOperator.jl.svg?branch=master)](https://travis-ci.org/joshday/SweepOperator.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/at5bcso64joc6wbj/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/sweepoperator-jl/branch/master)
 [![codecov.io](http://codecov.io/github/joshday/SweepOperator.jl/coverage.svg?branch=master)](http://codecov.io/github/joshday/SweepOperator.jl?branch=master)
-
-[![SweepOperator](http://pkg.julialang.org/badges/SweepOperator_0.4.svg)](http://pkg.julialang.org/?pkg=SweepOperator)
 [![SweepOperator](http://pkg.julialang.org/badges/SweepOperator_0.5.svg)](http://pkg.julialang.org/?pkg=SweepOperator)
 
 
@@ -20,16 +18,17 @@ Install with:
 Pkg.add("SweepOperator")
 ```
 
-# `sweep!`
+# The `sweep!` function
 
 ```julia
-sweep!(A, k, inv = false)
+function sweep!(A, k, inv=false)
+    ...
 ```
 
 For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  **Only the upper triangle is read and swept**.  The inverse sweep is performed with `inv = true`.
 
 ```julia
-sweep!(A, range, inv = false)
+sweep!(A, range, true)
 ```
 
 Sweep over every index in `range`.
