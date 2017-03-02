@@ -1,8 +1,8 @@
 module SweepOperator
 export sweep!
 
-AMat{T} = AbstractMatrix{T}
-AVec{T} = AbstractVector{T}
+const AMat = AbstractMatrix
+const AVec = AbstractVector
 
 
 """
