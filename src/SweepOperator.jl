@@ -1,8 +1,8 @@
 module SweepOperator
 export sweep!
 
-typealias AMat{T} AbstractMatrix{T}
-typealias AVec{T} AbstractVector{T}
+const AMat{T} = AbstractMatrix{T}
+const AVec{T} = AbstractVector{T}
 
 
 """
@@ -26,19 +26,10 @@ sweep!(xtx, 1, true)
 ```
 """
 function sweep!{T<:LinAlg.BlasFloat}(A::AMat{T}, k::Integer, inv::Bool = false)
-    n, p = size(A)
     # ensure @inbounds is safe
-    @assert n == p "A must be square"
-    @assert 1 <= k <= p "pivot element not within range"
-    @inbounds d = one(T) / A[k, k]  # pivot
-    # get column A[:, k] (hack because only upper triangle is available)
-    akk = zeros(T, p)
-    for j in 1:k
-        @inbounds akk[j] = A[j, k]
-    end
-    for j in k+1:p
-        @inbounds akk[j] = A[k, j]
-    end
+    p = LinAlg.checksquare(A)
+    d = one(T) / A[k, k]  # pivot
+    akk = Symmetric(A)[:, k]  # k-th column (use Symmetric because only triu available)
     BLAS.syrk!('U', 'N', -d, akk, one(T), A)  # everything not in col/row k
     scale!(akk, d * (-one(T)) ^ inv)
     for i in 1:k-1  # col k

@@ -1,20 +1,10 @@
-using SweepOperator
-
-# necessary to support 0.4 and 0.5
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
-
+module SweepOperatorTests
+using SweepOperator, Base.Test
 
 # setup
 n, p = 1000, 10
 x = randn(n, p)
 xtx = x'x
-
-
 
 @testset "Sweep One By One" begin
     A = deepcopy(xtx)
@@ -52,3 +42,5 @@ end
     sweep!(xytxy, 1:p)
     @test xytxy[1:p, end] ≈ x\y
 end
+
+end #module
