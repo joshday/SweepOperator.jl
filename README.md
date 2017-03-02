@@ -13,22 +13,22 @@ The symmetric sweep operator is a powerful tool in computational statistics with
 - MANOVA
 - and more
 
-Install with:
+# Installation
+
 ```julia
 Pkg.add("SweepOperator")
 ```
 
-# The `sweep!` function
+# Usage
 
 ```julia
-function sweep!(A, k, inv=false)
-    ...
+sweep!(A, k)
 ```
 
-For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  **Only the upper triangle is read and swept**.  The inverse sweep is performed with `inv = true`.
+For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  **Only the upper triangle is read and swept**.  The inverse sweep is performed with `sweep!(A, k, true)`.
 
 ```julia
-sweep!(A, range, true)
+sweep!(A, range)
 ```
 
 Sweep over every index in `range`.
