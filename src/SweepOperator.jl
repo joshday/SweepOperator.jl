@@ -32,10 +32,10 @@ function sweep!{T<:LinAlg.BlasFloat}(A::AMat{T}, k::Integer, inv::Bool = false)
     akk = Symmetric(A)[:, k]  # k-th column (use Symmetric because only triu available)
     BLAS.syrk!('U', 'N', -d, akk, one(T), A)  # everything not in col/row k
     scale!(akk, d * (-one(T)) ^ inv)
-    for i in 1:k-1  # col k
+    for i in 1:(k-1)  # col k
         @inbounds A[i, k] = akk[i]
     end
-    for j in k+1:p  # row k
+    for j in (k+1):p  # row k
         @inbounds A[k, j] = akk[j]
     end
     A[k, k] = -d  # pivot element
