@@ -4,6 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/at5bcso64joc6wbj/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/sweepoperator-jl/branch/master)
 [![codecov.io](http://codecov.io/github/joshday/SweepOperator.jl/coverage.svg?branch=master)](http://codecov.io/github/joshday/SweepOperator.jl?branch=master)
 [![SweepOperator](http://pkg.julialang.org/badges/SweepOperator_0.5.svg)](http://pkg.julialang.org/?pkg=SweepOperator)
+[![SweepOperator](http://pkg.julialang.org/badges/SweepOperator_0.6.svg)](http://pkg.julialang.org/?pkg=SweepOperator)
 
 
 The symmetric sweep operator is a powerful tool in computational statistics with uses in
