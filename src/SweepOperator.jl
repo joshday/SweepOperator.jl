@@ -26,20 +26,6 @@ sweep!(xtx, 1, true)
 ```
 """
 function sweep!{T<:LinAlg.BlasFloat}(A::AMat{T}, k::Integer, inv::Bool = false)
-    # # ensure @inbounds is safe
-    # p = LinAlg.checksquare(A)
-    # d = one(T) / A[k, k]  # pivot
-    # akk = Symmetric(A)[:, k]  # k-th column (use Symmetric because only triu available)
-    # BLAS.syrk!('U', 'N', -d, akk, one(T), A)  # everything not in col/row k
-    # scale!(akk, d * (-one(T)) ^ inv)
-    # for i in 1:(k-1)  # col k
-    #     @inbounds A[i, k] = akk[i]
-    # end
-    # for j in (k+1):p  # row k
-    #     @inbounds A[k, j] = akk[j]
-    # end
-    # A[k, k] = -d  # pivot element
-    # A
     sweep_with_buffer!(zeros(T, size(A, 2)), A, k, inv)
 end
 
@@ -49,7 +35,7 @@ function sweep_with_buffer!{T<:LinAlg.BlasFloat}(akk::AVec{T}, A::AMat{T}, k::In
     # ensure @inbounds is safe
     p = LinAlg.checksquare(A)
     p == length(akk) || throw(DimensionError("buffer size incorrect"))
-    d = one(T) / A[k, k]  # pivot
+    @inbounds d = one(T) / A[k, k]  # pivot
     # get column A[:, k] (hack because only upper triangle is available)
     for j in 1:k
         @inbounds akk[j] = A[j, k]
@@ -65,7 +51,7 @@ function sweep_with_buffer!{T<:LinAlg.BlasFloat}(akk::AVec{T}, A::AMat{T}, k::In
     for j in (k+1):p  # row k
         @inbounds A[k, j] = akk[j]
     end
-    A[k, k] = -d  # pivot element
+    @inbounds A[k, k] = -d  # pivot element
     A
 end
 
