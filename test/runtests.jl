@@ -1,5 +1,5 @@
 module SweepOperatorTests
-using SweepOperator, Base.Test
+using SweepOperator, Test
 
 # setup
 n, p = 1000, 10
@@ -35,7 +35,6 @@ end
 end
 
 @testset "Linear Regression" begin
-    x = randn(n, p)
     y = x * collect(1.:p) + randn(n)
     xy = [x y]
     xytxy = xy'xy
