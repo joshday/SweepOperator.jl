@@ -1,4 +1,3 @@
-module SweepOperatorTests
 using SweepOperator, Test
 
 # setup
@@ -41,5 +40,3 @@ end
     sweep!(xytxy, 1:p)
     @test xytxy[1:p, end] ≈ x\y
 end
-
-end #module
