@@ -1,2 +1,5 @@
+name = "SweepOperator"
+uuid = "aa8b1a16-e029-5dd1-8c40-8a69f5dc373c"
+
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
