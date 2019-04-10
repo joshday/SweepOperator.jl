@@ -9,31 +9,25 @@ const AVec = AbstractVector
 
 
 """
-# Symmetric sweep operator
-Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten.
-`inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
+    sweep!(A, k ; inv=false)
+    sweep!(A, ks; inv=false)
 
-`sweep!(A, k, inv = false)`
+Perform the sweep operation (or inverse sweep if `inv=true`) on matrix `A` on element `k`
+(or each element in `ks`).  Only the upper triangle is read/swept.
 
-Providing a `Range`, rather than an `Integer`, sweeps on each element in the range.
+# Example:
 
-`sweep!(A, first:last, inv = false)`
-
-### Example:
-
-```julia
-x = randn(100, 10)
-xtx = x'x
-sweep!(xtx, 1)
-sweep!(xtx, 1, true)
-```
+    x = randn(100, 10)
+    xtx = x'x
+    sweep!(xtx, 1)
+    sweep!(xtx, 1, true)
 """
 function sweep!(A::AMat, k::Integer, inv::Bool = false)
     sweep_with_buffer!(Vector{eltype(A)}(undef, size(A, 2)), A, k, inv)
 end
 
 
-function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = false) where 
+function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = false) where
         {T<:BlasFloat}
     # ensure @inbounds is safe
     p = checksquare(A)
@@ -65,7 +59,7 @@ function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat,
     end
     A
 end
-function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, ks::AVec{I}, inv::Bool = false) where 
+function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, ks::AVec{I}, inv::Bool = false) where
         {T<:BlasFloat, I<:Integer}
     for k in ks
         sweep_with_buffer!(akk, A, k, inv)

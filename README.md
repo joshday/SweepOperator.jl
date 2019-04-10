@@ -1,37 +1,30 @@
 # SweepOperator
 
-[![Build Status](https://travis-ci.org/joshday/SweepOperator.jl.svg?branch=master)](https://travis-ci.org/joshday/SweepOperator.jl)
-[![Build status](https://ci.appveyor.com/api/projects/status/at5bcso64joc6wbj/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/sweepoperator-jl/branch/master)
-[![codecov.io](http://codecov.io/github/joshday/SweepOperator.jl/coverage.svg?branch=master)](http://codecov.io/github/joshday/SweepOperator.jl?branch=master)
-[![SweepOperator](http://pkg.julialang.org/badges/SweepOperator_0.6.svg)](http://pkg.julialang.org/?pkg=SweepOperator)
+| Build | Test |
+|-------|------|
+| [![Build Status](https://travis-ci.org/joshday/SweepOperator.jl.svg?branch=master)](https://travis-ci.org/joshday/SweepOperator.jl) [![Build status](https://ci.appveyor.com/api/projects/status/at5bcso64joc6wbj/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/sweepoperator-jl/branch/master) | [![codecov.io](http://codecov.io/github/joshday/SweepOperator.jl/coverage.svg?branch=master)](http://codecov.io/github/joshday/SweepOperator.jl?branch=master) |
 
 
-The symmetric sweep operator is a powerful tool in computational statistics with uses in
+The symmetric sweep operator is a powerful tool in computational statistics with uses in stepwise regression, conditional multivariate normal distributions, MANOVA, and more.  This package exports a single function:
 
-- (stepwise) linear regression
-- conditional multivariate normal distributions
-- MANOVA
-- and more
-
-# Installation
+## `sweep!`
 
 ```julia
-Pkg.add("SweepOperator")
+sweep!(A, k ; inv=false)
+sweep!(A, ks; inv=false)
 ```
 
-# Usage
+Perform the sweep operation (or inverse sweep if `inv=true`) on symmetric matrix `A` on
+element `k` (or each element in `ks`).  **Only the upper triangle is read/swept.**
+
+### Example:
 
 ```julia
-sweep!(A, k)
+x = randn(100, 10)
+xtx = x'x
+sweep!(xtx, 1)
+sweep!(xtx, 1, true)
 ```
-
-For matrix `A` and integer `k`, perform the symmetric sweep in place on `A`.  **Only the upper triangle is read and swept**.  The inverse sweep is performed with `sweep!(A, k, true)`.
-
-```julia
-sweep!(A, range)
-```
-
-Sweep over every index in `range`.
 
 
 # Details on Symmetric Sweeping:
