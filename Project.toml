@@ -1,5 +1,5 @@
 name = "SweepOperator"
-uuid = "aa8b1a16-e029-5dd1-8c40-8a69f5dc373c"
+uuid = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 version = "0.3.0"
 
 [deps]
