@@ -7,7 +7,6 @@ import LinearAlgebra: BlasFloat, checksquare
 const AMat = AbstractMatrix
 const AVec = AbstractVector
 
-
 """
     sweep!(A, k ; inv=false)
     sweep!(A, ks; inv=false)
@@ -26,45 +25,34 @@ function sweep!(A::AMat, k::Integer, inv::Bool = false)
     sweep_with_buffer!(Vector{eltype(A)}(undef, size(A, 2)), A, k, inv)
 end
 
+function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat, I<:Integer}
+    akk = Vector{T}(undef, size(A,1))
+    for k in ks
+        sweep_with_buffer!(akk, A, k, inv)
+    end
+    A
+end
 
-function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = false) where
-        {T<:BlasFloat}
+function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = false) where {T}
     # ensure @inbounds is safe
     p = checksquare(A)
+    1 ≤ k ≤ p || throw(BoundsError(A, k))
     p == length(akk) || throw(DimensionError("incorrect buffer size"))
-    @inbounds d = one(T) / A[k, k]  # pivot
-    # get column A[:, k] (hack because only upper triangle is available)
-    for j in 1:k
-        @inbounds akk[j] = A[j, k]
+    @inbounds @views begin
+        d = one(T) / A[k, k]                        # pivot
+        copyto!(akk, Symmetric(A, :U)[:, k])        # akk = A[:, k]
+        # everything not in col/row k
+        if A isa StridedMatrix{<:Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}}
+            BLAS.syrk!('U', 'N', -d, akk, one(T), A)
+        else
+            A .+= UpperTriangular(-d * akk * akk')
+        end
+        rmul!(akk, d * (-one(T)) ^ inv)             # akk .* d (negated if inv=true)
+        copyto!(A[1:k-1,k], akk[1:k-1])             # col k
+        copyto!(A[k, k+1:end], akk[k+1:end])        # row k
+        A[k, k] = -d                                # pivot element
     end
-    for j in (k+1):p
-        @inbounds akk[j] = A[k, j]
-    end
-    BLAS.syrk!('U', 'N', -d, akk, one(T), A)  # everything not in col/row k
-    rmul!(akk, d * (-one(T)) ^ inv)
-    for i in 1:(k-1)  # col k
-        @inbounds A[i, k] = akk[i]
-    end
-    for j in (k+1):p  # row k
-        @inbounds A[k, j] = akk[j]
-    end
-    @inbounds A[k, k] = -d  # pivot element
-    A
-end
-
-function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat, I<:Integer}
-    akk = zeros(T, size(A, 1))
-    for k in ks
-        sweep_with_buffer!(akk, A, k, inv)
-    end
-    A
-end
-function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, ks::AVec{I}, inv::Bool = false) where
-        {T<:BlasFloat, I<:Integer}
-    for k in ks
-        sweep_with_buffer!(akk, A, k, inv)
-    end
-    A
+    return A
 end
 
 end # module

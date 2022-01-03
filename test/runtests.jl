@@ -1,4 +1,4 @@
-using SweepOperator, Test
+using SweepOperator, LinearAlgebra, Test
 
 # setup
 n, p = 1000, 10
@@ -28,6 +28,14 @@ end
 @testset "Sweep All" begin
     A = deepcopy(xtx)
     B = deepcopy(xtx)
+    sweep!(A, 1:p)
+    sweep!(A, 1:p, true)
+    @test A ≈ B
+end
+
+@testset "Non-StridedArray" begin
+    A = Diagonal(deepcopy(xtx))
+    B = Diagonal(deepcopy(xtx))
     sweep!(A, 1:p)
     sweep!(A, 1:p, true)
     @test A ≈ B
