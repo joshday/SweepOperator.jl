@@ -37,20 +37,19 @@ function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = fa
     # ensure @inbounds is safe
     p = checksquare(A)
     1 ≤ k ≤ p || throw(BoundsError(A, k))
-    p == length(akk) || throw(DimensionError("incorrect buffer size"))
+    p == length(akk) || throw(DimensionError("Incorrect buffer size."))
     @inbounds @views begin
-        d = one(T) / A[k, k]                        # pivot
-        copyto!(akk, Symmetric(A, :U)[:, k])        # akk = A[:, k]
-        # everything not in col/row k
+        d = one(T) / A[k, k]                            # pivot
+        copyto!(akk, Symmetric(A, :U)[:, k])            # akk = A[:, k]
         if A isa StridedMatrix{<:Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}}
-            BLAS.syrk!('U', 'N', -d, akk, one(T), A)
+            BLAS.syrk!('U', 'N', -d, akk, one(T), A)    # everything not in col/row k
         else
             A .+= UpperTriangular(-d * akk * akk')
         end
-        rmul!(akk, d * (-one(T)) ^ inv)             # akk .* d (negated if inv=true)
-        copyto!(A[1:k-1,k], akk[1:k-1])             # col k
-        copyto!(A[k, k+1:end], akk[k+1:end])        # row k
-        A[k, k] = -d                                # pivot element
+        rmul!(akk, d * (-one(T)) ^ inv)                 # akk .* d (negated if inv=true)
+        copyto!(A[1:k-1,k], akk[1:k-1])                 # col k
+        copyto!(A[k, k+1:end], akk[k+1:end])            # row k
+        A[k, k] = -d                                    # pivot element
     end
     return A
 end
