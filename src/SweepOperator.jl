@@ -40,15 +40,15 @@ function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = fa
     p == length(akk) || throw(DimensionError("Incorrect buffer size."))
     @inbounds @views begin
         d = one(T) / A[k, k]                            # pivot
-        copyto!(akk, Symmetric(A, :U)[:, k])            # akk = A[:, k]
+        copy!(akk, Symmetric(A, :U)[:, k])            # akk = A[:, k]
         if A isa StridedMatrix{<:Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}}
             BLAS.syrk!('U', 'N', -d, akk, one(T), A)    # everything not in col/row k
         else
             A .+= UpperTriangular(-d * akk * akk')
         end
         rmul!(akk, d * (-one(T)) ^ inv)                 # akk .* d (negated if inv=true)
-        copyto!(A[1:k-1,k], akk[1:k-1])                 # col k
-        copyto!(A[k, k+1:end], akk[k+1:end])            # row k
+        copy!(A[1:k-1,k], akk[1:k-1])                 # col k
+        copy!(A[k, k+1:end], akk[k+1:end])            # row k
         A[k, k] = -d                                    # pivot element
     end
     return A
