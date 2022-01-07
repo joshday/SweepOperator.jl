@@ -6,39 +6,49 @@ x = randn(n, p)
 xtx = x'x
 
 @testset "Sweep One By One" begin
-    A = deepcopy(xtx)
-    B = deepcopy(xtx)
+    A = copy(xtx)
+    B = copy(xtx)
     for j in 1:p
         sweep!(A, j)
         sweep!(A, j, true)
     end
-    @test A ≈ B
+    @test UpperTriangular(A) ≈ UpperTriangular(B)
 
-    A = deepcopy(xtx)
-    B = deepcopy(xtx)
+    A = copy(xtx)
+    B = copy(xtx)
     for j in 1:p
-        sweep!(A, j, true)
+        sweep!(A, j)
     end
     for j in 1:p
         sweep!(A, j, true)
     end
-    @test A ≈ B
+    @test UpperTriangular(A) ≈ UpperTriangular(B)
 end
 
 @testset "Sweep All" begin
-    A = deepcopy(xtx)
-    B = deepcopy(xtx)
+    A = copy(xtx)
+    B = copy(xtx)
     sweep!(A, 1:p)
     sweep!(A, 1:p, true)
     @test A ≈ B
 end
 
-@testset "Non-StridedArray" begin
-    A = Diagonal(deepcopy(xtx))
-    B = Diagonal(deepcopy(xtx))
+@testset "UpperTriangular" begin
+    A = UpperTriangular(copy(xtx))
+    B = UpperTriangular(copy(xtx))
     sweep!(A, 1:p)
     sweep!(A, 1:p, true)
     @test A ≈ B
+end
+
+@testset "Hermitian/Symmetric" begin
+    A = Hermitian(copy(xtx))
+    B = Symmetric(copy(xtx))
+    sweep!(A, 1:p)
+    sweep!(A, 1:p, true)
+    sweep!(B, 1:p)
+    sweep!(B, 1:p, true)
+    @test A ≈ B ≈ xtx
 end
 
 @testset "Linear Regression" begin

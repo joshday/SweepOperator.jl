@@ -39,19 +39,47 @@ function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = fa
     1 ≤ k ≤ p || throw(BoundsError(A, k))
     p == length(akk) || throw(DimensionError("Incorrect buffer size."))
     @inbounds @views begin
-        d = one(T) / A[k, k]                            # pivot
-        copy!(akk, Symmetric(A, :U)[:, k])            # akk = A[:, k]
-        if A isa StridedMatrix{<:Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}}
-            BLAS.syrk!('U', 'N', -d, akk, one(T), A)    # everything not in col/row k
-        else
-            A .+= UpperTriangular(-d * akk * akk')
-        end
-        rmul!(akk, d * (-one(T)) ^ inv)                 # akk .* d (negated if inv=true)
-        copy!(A[1:k-1,k], akk[1:k-1])                 # col k
-        copy!(A[k, k+1:end], akk[k+1:end])            # row k
-        A[k, k] = -d                                    # pivot element
+        d = one(T) / A[k, k]                # pivot
+        copy!(akk, Symmetric(A, :U)[:, k])  # akk = A[:, k]
+        syrk!(A, -d, akk)                   # everything not in row/col k
+        rmul!(akk, d * (-one(T)) ^ inv)     # akk .* d (negated if inv=true)
+        setrowcol!(A, k, akk)
+        A[k, k] = -d                        # pivot element
     end
     return A
 end
+
+#-----------------------------------------------------------------------------# setrowcol!
+# Set upper triangle of: (A[k, :] = x; A[:, k] = x)
+function setrowcol!(A::StridedArray, k, x)
+    @views copy!(A[1:k-1,k], x[1:k-1])         # col k
+    @views copy!(A[k, k+1:end], x[k+1:end])    # row k
+end
+
+setrowcol!(A::Union{Hermitian,Symmetric,UpperTriangular}, k, x) = setrowcol!(A.data, k, x)
+
+#-----------------------------------------------------------------------------# syrk!
+const BlasNumber = Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}
+
+# In-place update of (the upper triangle of) A + α * x * x'
+function syrk!(A::StridedMatrix{T}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber}
+    BLAS.syrk!('U', 'N', α, x, one(T), A)
+end
+
+function syrk!(A::Hermitian{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+    Hermitian(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
+end
+
+function syrk!(A::Symmetric{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+    Symmetric(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
+end
+
+function syrk!(A, α, x) where {T}
+    p = checksquare(A)
+    for i in 1:p, j in i:p
+        @inbounds A[i,j] += α * x[i] * x[j]
+    end
+end
+
 
 end # module
