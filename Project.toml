@@ -1,6 +1,6 @@
 name = "SweepOperator"
 uuid = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
-version = "0.3.3"
+version = "0.3.4"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
