@@ -25,7 +25,7 @@ function sweep!(A::AMat, k::Integer, inv::Bool = false)
     sweep_with_buffer!(Vector{eltype(A)}(undef, size(A, 2)), A, k, inv)
 end
 
-function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat, I<:Integer}
+function sweep!(A::AMat{T}, ks::AVec{<:Integer}, inv::Bool = false) where {T<:BlasFloat}
     akk = Vector{T}(undef, size(A,1))
     for k in ks
         sweep_with_buffer!(akk, A, k, inv)
@@ -66,15 +66,15 @@ function syrk!(A::StridedMatrix{T}, α::T, x::AbstractArray{<:T}) where {T<:Blas
     BLAS.syrk!('U', 'N', α, x, one(T), A)
 end
 
-function syrk!(A::Hermitian{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+function syrk!(A::Hermitian{T, <:StridedMatrix{T}}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber}
     Hermitian(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
 end
 
-function syrk!(A::Symmetric{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+function syrk!(A::Symmetric{T, <:StridedMatrix{T}}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber}
     Symmetric(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
 end
 
-function syrk!(A, α, x) where {T}
+function syrk!(A, α, x)
     p = checksquare(A)
     for i in 1:p, j in i:p
         @inbounds A[i,j] += α * x[i] * x[j]
