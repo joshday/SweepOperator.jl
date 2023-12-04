@@ -74,7 +74,7 @@ function syrk!(A::Symmetric{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasN
     Symmetric(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
 end
 
-function syrk!(A, α, x) where {T}
+function syrk!(A, α, x)  # fallback
     p = checksquare(A)
     for i in 1:p, j in i:p
         @inbounds A[i,j] += α * x[i] * x[j]
