@@ -7,6 +7,7 @@ import LinearAlgebra: BlasFloat, checksquare
 const AMat = AbstractMatrix
 const AVec = AbstractVector
 
+#-----------------------------------------------------------------------------# sweep!
 """
     sweep!(A, k ; inv=false)
     sweep!(A, ks; inv=false)
@@ -22,10 +23,11 @@ Perform the sweep operation (or inverse sweep if `inv=true`) on matrix `A` on el
     sweep!(xtx, 1, true)
 """
 function sweep!(A::AMat, k::Integer, inv::Bool = false)
-    sweep_with_buffer!(Vector{eltype(A)}(undef, size(A, 2)), A, k, inv)
+    akk = Vector{eltype(A)}(undef, size(A, 2))
+    sweep_with_buffer!(akk, A, k, inv)
 end
 
-function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat, I<:Integer}
+function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T <: BlasFloat, I <: Integer}
     akk = Vector{T}(undef, size(A,1))
     for k in ks
         sweep_with_buffer!(akk, A, k, inv)
@@ -33,6 +35,7 @@ function sweep!(A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T<:BlasFloat,
     A
 end
 
+#-----------------------------------------------------------------------------# sweep_with_buffer!
 function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = false) where {T}
     # ensure @inbounds is safe
     p = checksquare(A)
@@ -49,6 +52,14 @@ function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, k::Integer, inv::Bool = fa
     return A
 end
 
+# This is slower than unbuffered version??
+function sweep_with_buffer!(akk::AVec{T}, A::AMat{T}, ks::AVec{I}, inv::Bool = false) where {T, I <: Integer}
+    for k in ks
+        sweep_with_buffer!(akk, A, k, inv)
+    end
+    A
+end
+
 #-----------------------------------------------------------------------------# setrowcol!
 # Set upper triangle of: (A[k, :] = x; A[:, k] = x)
 function setrowcol!(A::StridedArray, k, x)
@@ -62,24 +73,23 @@ setrowcol!(A::Union{Hermitian,Symmetric,UpperTriangular}, k, x) = setrowcol!(A.d
 const BlasNumber = Union{LinearAlgebra.BlasFloat, LinearAlgebra.BlasComplex}
 
 # In-place update of (the upper triangle of) A + α * x * x'
-function syrk!(A::StridedMatrix{T}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber}
+function syrk!(A::StridedMatrix{T}, α::T, x::AbstractArray{<:T}) where {T <: BlasNumber}
     BLAS.syrk!('U', 'N', α, x, one(T), A)
 end
 
-function syrk!(A::Hermitian{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+function syrk!(A::Hermitian{T, S}, α::T, x::AbstractArray{<:T}) where {T <: BlasNumber, S <: StridedMatrix{T}}
     Hermitian(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
 end
 
-function syrk!(A::Symmetric{T, S}, α::T, x::AbstractArray{<:T}) where {T<:BlasNumber, S<:StridedMatrix{T}}
+function syrk!(A::Symmetric{T, S}, α::T, x::AbstractArray{<:T}) where {T <: BlasNumber, S <: StridedMatrix{T}}
     Symmetric(BLAS.syrk!('U', 'N', α, x, one(T), A.data))
 end
 
 function syrk!(A, α, x)  # fallback
     p = checksquare(A)
     for i in 1:p, j in i:p
-        @inbounds A[i,j] += α * x[i] * x[j]
+        @inbounds A[i, j] += α * x[i] * x[j]
     end
 end
-
 
 end # module
