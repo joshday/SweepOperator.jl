@@ -5,7 +5,7 @@
 | [![CI](https://github.com/joshday/SweepOperator.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/joshday/SweepOperator.jl/actions/workflows/CI.yml) | [![codecov.io](http://codecov.io/github/joshday/SweepOperator.jl/coverage.svg?branch=master)](http://codecov.io/github/joshday/SweepOperator.jl?branch=master) |
 
 
-The symmetric sweep operator is a powerful tool in computational statistics with uses in stepwise regression, conditional multivariate normal distributions, MANOVA, and more.  This package exports a single function:
+The symmetric sweep operator (a.k.a. principal pivot transform) is a powerful tool in computational statistics with uses in stepwise regression, conditional multivariate normal distributions, MANOVA, and more.  This package exports a single function:
 
 ## `sweep!`
 
